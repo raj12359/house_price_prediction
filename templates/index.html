@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EstateIQ - AI House Price Predictor | Linear Regression & Random Forest</title>
+    <meta name="description" content="Predict realistic house and flat prices using Linear Regression and Random Forest Regressor models with detailed comparison and feature importance analytics.">
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Background glowing ambient lights -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="app-wrapper">
+        <!-- Navigation Bar -->
+        <header class="navbar">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>Estate<span>IQ</span></h1>
+                    <span class="badge-tag">ML 3rd Sem Project</span>
+                </div>
+            </div>
+            <div class="nav-stats">
+                <div class="stat-pill">
+                    <span class="pill-dot emerald"></span>
+                    <span>Random Forest R²: <strong>98.15%</strong></span>
+                </div>
+                <div class="stat-pill">
+                    <span class="pill-dot blue"></span>
+                    <span>Linear Reg R²: <strong>90.91%</strong></span>
+                </div>
+                <div class="stat-pill count-pill">
+                    <span>2,500+ Trained Listings</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Title Banner -->
+        <section class="hero-section">
+            <div class="hero-chip">Machine Learning Real Estate Valuation</div>
+            <h2 class="hero-title">Predict House Prices with <span>Precision ML Models</span></h2>
+            <p class="hero-subtitle">
+                Estimate real estate valuations based on Location, Built-up Area, Bedrooms, Bathrooms, Property Age, and Parking using dual algorithms.
+            </p>
+        </section>
+
+        <!-- Main Workspace Grid -->
+        <main class="main-grid">
+            <!-- Left Panel: Property Input Form -->
+            <section class="glass-card input-card">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Property Specifications</h3>
+                        <p class="section-desc">Select property characteristics to evaluate</p>
+                    </div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="presets-bar">
+                    <span class="preset-label">Quick Presets:</span>
+                    <button type="button" class="preset-btn" id="presetCompact" data-bhk="1" data-sqft="650" data-bath="1" data-age="2" data-loc="Electronic City">1 BHK Starter</button>
+                    <button type="button" class="preset-btn" id="presetFamily" data-bhk="3" data-sqft="1650" data-bath="3" data-age="5" data-loc="HSR Layout">3 BHK Family</button>
+                    <button type="button" class="preset-btn" id="presetLuxury" data-bhk="4" data-sqft="2800" data-bath="4" data-age="1" data-loc="Indiranagar">4 BHK Luxury</button>
+                </div>
+
+                <form id="predictionForm" class="property-form">
+                    <!-- Location Selector -->
+                    <div class="form-group">
+                        <label for="locationSelect" class="form-label">
+                            <span>Prime Location</span>
+                            <span class="label-info">Bengaluru Metro Zones</span>
+                        </label>
+                        <div class="select-wrapper">
+                            <select id="locationSelect" class="custom-select" required>
+                                <option value="" disabled selected>Select location...</option>
+                                <option value="Indiranagar">Indiranagar (Premium)</option>
+                                <option value="Koramangala">Koramangala (High Demand)</option>
+                                <option value="Jayanagar">Jayanagar (Prime Residential)</option>
+                                <option value="Malleshwaram">Malleshwaram (Heritage Prime)</option>
+                                <option value="HSR Layout">HSR Layout (Startup Hub)</option>
+                                <option value="Bellandur">Bellandur (IT Corridor)</option>
+                                <option value="Hebbal">Hebbal (North Tech)</option>
+                                <option value="Whitefield">Whitefield (Tech Hub)</option>
+                                <option value="Marathahalli">Marathahalli (Outer Ring Rd)</option>
+                                <option value="Electronic City">Electronic City (IT Hub)</option>
+                            </select>
+                            <div class="select-arrow">&#9662;</div>
+                        </div>
+                    </div>
+
+                    <!-- Built-up Area (sq. ft.) -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="totalSqftInput" class="form-label">Super Built-up Area</label>
+                            <span class="value-display"><span id="sqftDisplay">1,450</span> sq.ft.</span>
+                        </div>
+                        <input type="range" id="sqftRange" min="450" max="4500" step="25" value="1450" class="custom-slider">
+                        <div class="range-limits">
+                            <span>450 sq.ft</span>
+                            <div class="direct-input-wrap">
+                                <span>Direct Input:</span>
+                                <input type="number" id="totalSqftInput" min="400" max="5000" value="1450" class="mini-input">
+                            </div>
+                            <span>4,500 sq.ft</span>
+                        </div>
+                    </div>
+
+                    <!-- Bedrooms (BHK) -->
+                    <div class="form-group">
+                        <label class="form-label">Bedrooms (BHK)</label>
+                        <div class="pill-group" id="bhkGroup">
+                            <button type="button" class="pill-btn" data-value="1">1 BHK</button>
+                            <button type="button" class="pill-btn" data-value="2">2 BHK</button>
+                            <button type="button" class="pill-btn active" data-value="3">3 BHK</button>
+                            <button type="button" class="pill-btn" data-value="4">4 BHK</button>
+                            <button type="button" class="pill-btn" data-value="5">5 BHK</button>
+                        </div>
+                        <input type="hidden" id="bhkInput" value="3">
+                    </div>
+
+                    <!-- Bathrooms -->
+                    <div class="form-group">
+                        <label class="form-label">Bathrooms</label>
+                        <div class="pill-group" id="bathroomsGroup">
+                            <button type="button" class="pill-btn" data-value="1">1 Bath</button>
+                            <button type="button" class="pill-btn" data-value="2">2 Baths</button>
+                            <button type="button" class="pill-btn active" data-value="3">3 Baths</button>
+                            <button type="button" class="pill-btn" data-value="4">4 Baths</button>
+                            <button type="button" class="pill-btn" data-value="5">5 Baths</button>
+                        </div>
+                        <input type="hidden" id="bathroomsInput" value="3">
+                    </div>
+
+                    <!-- Property Age & Parking Grid -->
+                    <div class="form-row-2">
+                        <!-- Property Age -->
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label for="ageRange" class="form-label">Property Age</label>
+                                <span class="value-display" id="ageDisplay">3 Years</span>
+                            </div>
+                            <input type="range" id="ageRange" min="0" max="25" value="3" class="custom-slider">
+                            <div class="range-limits">
+                                <span>Brand New (0y)</span>
+                                <span>25 Years</span>
+                            </div>
+                        </div>
+
+                        <!-- Dedicated Parking -->
+                        <div class="form-group">
+                            <label class="form-label">Reserved Parking</label>
+                            <div class="toggle-group" id="parkingGroup">
+                                <button type="button" class="toggle-btn active" data-value="1">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Yes (Covered)
+                                </button>
+                                <button type="button" class="toggle-btn" data-value="0">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    No Parking
+                                </button>
+                            </div>
+                            <input type="hidden" id="parkingInput" value="1">
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="predictBtn" class="primary-btn glow-btn">
+                        <span class="btn-text">Estimate Property Value</span>
+                        <div class="btn-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </div>
+                        <div class="btn-loader" style="display: none;"></div>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Panel: Estimation Results & Dual Algorithm Comparison -->
+            <section class="glass-card result-card" id="resultsSection">
+                <div class="card-header">
+                    <div class="header-icon emerald-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Valuation Results</h3>
+                        <p class="section-desc">Side-by-side Dual Algorithm Estimation</p>
+                    </div>
+                </div>
+
+                <!-- Primary Result Card (Random Forest Regressor) -->
+                <div class="estimation-card primary-estimation">
+                    <div class="card-top-tag">
+                        <span class="model-badge rf-badge">Recommended Model</span>
+                        <span class="accuracy-badge">Accuracy: <strong>98.15% R²</strong></span>
+                    </div>
+                    <div class="model-title-wrap">
+                        <h4>Random Forest Regressor</h4>
+                        <span class="model-subtitle">Multi-Tree Ensemble with Non-linear Learning</span>
+                    </div>
+                    <div class="price-showcase">
+                        <div class="currency-symbol">₹</div>
+                        <div class="price-value" id="rfPriceVal">1.48 Cr</div>
+                    </div>
+                    <div class="price-details-bar">
+                        <div class="p-detail">
+                            <span class="p-detail-lbl">Exact Value</span>
+                            <span class="p-detail-val" id="rfPriceExact">₹ 148.20 Lakhs</span>
+                        </div>
+                        <div class="p-detail">
+                            <span class="p-detail-lbl">Mean Abs Error</span>
+                            <span class="p-detail-val">± ₹ 6.76 Lakhs</span>
+                        </div>
+                        <div class="p-detail">
+                            <span class="p-detail-lbl">Rate / sq.ft</span>
+                            <span class="p-detail-val" id="rateSqftVal">₹ 10,220/sqft</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Result Card (Linear Regression) -->
+                <div class="estimation-card secondary-estimation">
+                    <div class="card-top-tag">
+                        <span class="model-badge lr-badge">Baseline Algorithm</span>
+                        <span class="accuracy-badge">Accuracy: <strong>90.91% R²</strong></span>
+                    </div>
+                    <div class="model-title-wrap">
+                        <h4>Linear Regression</h4>
+                        <span class="model-subtitle">Standardized Ordinary Least Squares (OLS)</span>
+                    </div>
+                    <div class="price-showcase secondary-showcase">
+                        <div class="currency-symbol">₹</div>
+                        <div class="price-value" id="lrPriceVal">1.42 Cr</div>
+                    </div>
+                    <div class="price-details-bar">
+                        <div class="p-detail">
+                            <span class="p-detail-lbl">Exact Value</span>
+                            <span class="p-detail-val" id="lrPriceExact">₹ 142.15 Lakhs</span>
+                        </div>
+                        <div class="p-detail">
+                            <span class="p-detail-lbl">Mean Abs Error</span>
+                            <span class="p-detail-val">± ₹ 17.93 Lakhs</span>
+                        </div>
+                        <div class="p-detail">
+                            <span class="p-detail-lbl">Formula</span>
+                            <span class="p-detail-val">y = &beta;₀ + &sum; &beta;ᵢxᵢ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Summary Footnote -->
+                <div class="insight-callout" id="insightCallout">
+                    <div class="callout-icon">💡</div>
+                    <div class="callout-text" id="insightText">
+                        <strong>Model Consensus:</strong> Both models project consistent valuations for this location with only a 4.1% variance. Random Forest provides higher precision by capturing neighborhood premiums.
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Deep Analytics & Viva Preparation Section -->
+        <section class="analytics-section">
+            <div class="analytics-tabs">
+                <button type="button" class="tab-btn active" data-tab="tabComparison">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    Model Comparison & Graphs
+                </button>
+                <button type="button" class="tab-btn" data-tab="tabFeatureImportance">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                    </svg>
+                    Feature Importance
+                </button>
+                <button type="button" class="tab-btn" data-tab="tabFormulas">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    ML Concepts & Viva Notes
+                </button>
+            </div>
+
+            <!-- Tab Content 1: Visual Comparison -->
+            <div class="tab-pane active" id="tabComparison">
+                <div class="charts-grid">
+                    <div class="chart-card glass-card">
+                        <h4>Actual vs Predicted Scatter Plot</h4>
+                        <p class="chart-desc">Shows ground truth test prices against predicted lines for both algorithms.</p>
+                        <div class="img-container">
+                            <img src="/static/images/actual_vs_predicted.png" alt="Actual vs Predicted House Prices" class="responsive-img">
+                        </div>
+                    </div>
+                    <div class="chart-card glass-card">
+                        <h4>Regression Metrics Benchmark</h4>
+                        <p class="chart-desc">Side-by-side comparison of R² Score, MAE, and RMSE.</p>
+                        <div class="img-container">
+                            <img src="/static/images/model_comparison.png" alt="Model Metrics Benchmark" class="responsive-img">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Table -->
+                <div class="table-wrap glass-card">
+                    <h4>Evaluation Metrics Summary Table</h4>
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Evaluation Metric</th>
+                                <th>Linear Regression</th>
+                                <th>Random Forest Regressor</th>
+                                <th>Interpretation / Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>R² Score (Accuracy)</strong></td>
+                                <td><span class="metric-tag blue">90.91%</span></td>
+                                <td><span class="metric-tag emerald">98.15% (Superior)</span></td>
+                                <td>Explains variance in price; higher is better (max 100%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mean Absolute Error (MAE)</strong></td>
+                                <td>₹ 17.93 Lakhs</td>
+                                <td><strong>₹ 6.76 Lakhs</strong></td>
+                                <td>Average magnitude of prediction error in Lakhs INR</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Root Mean Squared Error (RMSE)</strong></td>
+                                <td>₹ 28.69 Lakhs</td>
+                                <td><strong>₹ 12.94 Lakhs</strong></td>
+                                <td>Penalizes larger outlier errors more severely</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mean Absolute % Error (MAPE)</strong></td>
+                                <td>19.16%</td>
+                                <td><strong>5.21% (High Reliability)</strong></td>
+                                <td>Relative percentage deviation on test set</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Feature Importance -->
+            <div class="tab-pane" id="tabFeatureImportance">
+                <div class="feature-pane-grid">
+                    <div class="chart-card glass-card">
+                        <h4>Random Forest Gini / MDI Feature Importance</h4>
+                        <p class="chart-desc">Identifies which input features have the strongest statistical weight on house valuation.</p>
+                        <div class="img-container">
+                            <img src="/static/images/feature_importance.png" alt="Feature Importance Plot" class="responsive-img">
+                        </div>
+                    </div>
+                    <div class="glass-card feature-insights-card">
+                        <h4>Key Feature Takeaways</h4>
+                        <ul class="takeaways-list">
+                            <li>
+                                <div class="takeaway-bullet">1</div>
+                                <div>
+                                    <strong>Built-up Area (sq.ft) (~62.5%):</strong>
+                                    <p>The single most dominant price predictor. Price scales proportionally with carpet and super built-up area.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="takeaway-bullet">2</div>
+                                <div>
+                                    <strong>Location Factor (~28% combined):</strong>
+                                    <p>High-end tech hubs like Koramangala, Indiranagar, and Jayanagar command 2x to 3x higher base rate per sq.ft compared to outer corridors.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="takeaway-bullet">3</div>
+                                <div>
+                                    <strong>Property Age & Bathrooms (~5%):</strong>
+                                    <p>Newer properties have lower depreciation. Additional bathrooms add luxury premium.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 3: Viva Preparation Notes -->
+            <div class="tab-pane" id="tabFormulas">
+                <div class="viva-grid">
+                    <div class="glass-card viva-card">
+                        <div class="viva-badge">Algorithm 1</div>
+                        <h3>Linear Regression</h3>
+                        <p class="viva-intro">A supervised learning algorithm that models the linear relationship between independent variables and continuous price target.</p>
+                        
+                        <div class="formula-box">
+                            <code>y = &beta;₀ + &beta;₁(sqft) + &beta;₂(bhk) + &beta;₃(baths) + &sum; &beta;ᵢ(loc_i) + &epsilon;</code>
+                        </div>
+                        <div class="viva-points">
+                            <strong>Key Assumptions:</strong>
+                            <ul>
+                                <li>Linearity between features and target</li>
+                                <li>No severe multicollinearity (checked with VIF)</li>
+                                <li>Homoscedasticity (constant variance of residuals)</li>
+                            </ul>
+                            <strong>Strengths:</strong> Highly interpretable, extremely fast training, great mathematical baseline.
+                        </div>
+                    </div>
+
+                    <div class="glass-card viva-card">
+                        <div class="viva-badge green-badge">Algorithm 2</div>
+                        <h3>Random Forest Regressor</h3>
+                        <p class="viva-intro">An ensemble learning method that fits 150 randomized decision trees (bagging) and outputs the mean prediction.</p>
+                        
+                        <div class="formula-box">
+                            <code>ŷ = (1 / B) &sum;ₖ₌₁ᴮ Tₖ(x)</code>
+                        </div>
+                        <div class="viva-points">
+                            <strong>Why it out-performed Linear Regression:</strong>
+                            <ul>
+                                <li>Captures non-linear interactions (e.g. large luxury penthouses have exponential price scaling)</li>
+                                <li>Robust against outliers due to tree voting aggregation</li>
+                                <li>Does not require feature scaling to be effective</li>
+                            </ul>
+                            <strong>Hyperparameters used:</strong> <code>n_estimators=150</code>, <code>max_depth=12</code>, <code>random_state=42</code>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>House Price Prediction System &bull; Machine Learning Project (Semester 3)</p>
+            <p class="sub-footer">Built with Python, Scikit-Learn, Pandas, NumPy, and Flask.</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

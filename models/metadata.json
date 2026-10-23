@@ -1,0 +1,90 @@
+{
+    "locations": [
+        "Bellandur",
+        "Electronic City",
+        "HSR Layout",
+        "Hebbal",
+        "Indiranagar",
+        "Jayanagar",
+        "Koramangala",
+        "Malleshwaram",
+        "Marathahalli",
+        "Whitefield"
+    ],
+    "features": {
+        "numerical": [
+            "total_sqft",
+            "bhk",
+            "bathrooms",
+            "property_age",
+            "parking"
+        ],
+        "categorical": [
+            "location"
+        ]
+    },
+    "metrics": {
+        "linear_regression": {
+            "r2_score": 0.9091,
+            "mae": 17.93,
+            "rmse": 28.69,
+            "mape": 19.16
+        },
+        "random_forest": {
+            "r2_score": 0.9815,
+            "mae": 6.76,
+            "rmse": 12.94,
+            "mape": 5.21
+        }
+    },
+    "feature_importances": [
+        {
+            "feature": "total_sqft",
+            "importance": 0.6245
+        },
+        {
+            "feature": "loc_Koramangala",
+            "importance": 0.1254
+        },
+        {
+            "feature": "loc_Indiranagar",
+            "importance": 0.0948
+        },
+        {
+            "feature": "loc_Jayanagar",
+            "importance": 0.0544
+        },
+        {
+            "feature": "loc_Electronic City",
+            "importance": 0.0325
+        },
+        {
+            "feature": "loc_Malleshwaram",
+            "importance": 0.0271
+        },
+        {
+            "feature": "loc_HSR Layout",
+            "importance": 0.0181
+        },
+        {
+            "feature": "property_age",
+            "importance": 0.0092
+        },
+        {
+            "feature": "bhk",
+            "importance": 0.0042
+        },
+        {
+            "feature": "loc_Marathahalli",
+            "importance": 0.003
+        }
+    ],
+    "dataset_stats": {
+        "total_records": 2500,
+        "min_sqft": 450,
+        "max_sqft": 4717,
+        "min_price_lakhs": 18.51,
+        "max_price_lakhs": 780.29,
+        "avg_price_lakhs": 133.88
+    }
+}
